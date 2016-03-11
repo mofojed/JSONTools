@@ -32,7 +32,20 @@
     NSDictionary *objA = @{@"user": @{@"firstName": @"Albert"}};
     NSDictionary *objB = @{@"user": @{@"firstName": @"Albert",
                                       @"lastName": @"Einstein"}};
+    
+    NSArray *patches = [JSONPatch createPatchesComparingCollectionsOld:objA toNew:objB];
+    NSArray *expected = @[@{@"op": @"add",
+                            @"path": @"/user/lastName",
+                            @"value": @"Einstein"}];
+    XCTAssertEqualObjects(patches, expected, @"Failed to generate add patch, expected %@, found %@", expected, patches);
+}
 
+- (void)testShouldGenerateAddFromNull
+{
+    NSDictionary *objA = @{@"user": @{@"firstName": @"Albert", @"lastName":[NSNull null]}};
+    NSDictionary *objB = @{@"user": @{@"firstName": @"Albert",
+                                      @"lastName": @"Einstein"}};
+    
     NSArray *patches = [JSONPatch createPatchesComparingCollectionsOld:objA toNew:objB];
     NSArray *expected = @[@{@"op": @"add",
                             @"path": @"/user/lastName",
@@ -85,6 +98,22 @@
     NSArray *expected = @[@{@"op": @"remove",
                             @"path": @"/lastName"}];
 
+    NSArray *patches = [JSONPatch createPatchesComparingCollectionsOld:objA toNew:objB];
+    XCTAssertEqualObjects(patches, expected, @"Failed to generate remove patch, expected %@, found %@", expected, patches);
+}
+
+
+- (void)testShouldGenerateRemoveFromNull
+{
+    NSDictionary *objA = @{@"firstName": @"Albert",
+                           @"lastName": @"Einstein"};
+    
+    NSDictionary *objB = @{@"firstName": @"Albert",
+                           @"lastName": [NSNull null]};
+    
+    NSArray *expected = @[@{@"op": @"remove",
+                            @"path": @"/lastName"}];
+    
     NSArray *patches = [JSONPatch createPatchesComparingCollectionsOld:objA toNew:objB];
     XCTAssertEqualObjects(patches, expected, @"Failed to generate remove patch, expected %@, found %@", expected, patches);
 }

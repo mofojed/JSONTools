@@ -303,10 +303,19 @@
              newValue &&
             ![oldValue isEqual:newValue])
     {
+        if ([[NSNull null] isEqual:oldValue]) {
+            [patches addObject:@{@"op": @"add",
+                                 @"path": path,
+                                 @"value": newValue}];
+        } else if ([[NSNull null] isEqual:newValue]) {
+            [patches addObject:@{@"op": @"remove",
+                                 @"path": path}];
+        } else {
             *hasReplacementPtr = YES;
             [patches addObject:@{@"op": @"replace",
                                  @"path": path,
                                  @"value": newValue}];
+        }
     }
     return patches;
 }
